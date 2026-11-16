@@ -32,3 +32,11 @@ En Java, a == b donnerait false : sur deux String, l'opérateur == compare les r
 
 - Le suffixe m et le choix entre double et decimal.
 Le suffixe m indique un littéral de type decimal. Un double stocke les nombres en base 2, où 0.1 et 0.2 n'ont pas de représentation exacte : leur somme vaut 0.30000000000000004, d'où False. Un decimal stocke les nombres en base 10, donc 0.1m + 0.2m vaut exactement 0.3m, d'où True. Le choix est important dans les programmes financiers ou comptables (banque, facturation, paie), où les montants doivent être exacts au centime près : on utilise alors decimal, l'équivalent de BigDecimal en Java. Pour les calculs scientifiques, physiques ou graphiques, on garde double, plus rapide et capable de représenter des valeurs bien plus grandes, quitte à comparer avec une tolérance plutôt qu'avec ==.
+
+### 2.2
+
+**Avertissements du compilateur.** On obtient deux avertissements : CS8600 sur la première ligne, car on affecte le résultat de `Console.ReadLine()`, de type `string?`, à une variable de type `string` ; et CS8602 sur la deuxième, car on accède à `saisie.Length` alors que `saisie` peut valoir `null`.
+
+**Pourquoi `Console.ReadLine()` peut renvoyer `null`.** `Console.ReadLine()` a pour type de retour `string?`. Elle renvoie `null` lorsqu'il n'y a plus rien à lire sur l'entrée standard : quand l'utilisateur ferme l'entrée avec Ctrl+D (Linux, macOS) ou Ctrl+Z puis Entrée (Windows), ou quand l'entrée est redirigée depuis un fichier dont on a atteint la fin. Il ne faut pas confondre ce cas avec une ligne vide : si l'utilisateur appuie seulement sur Entrée, on obtient la chaîne vide `""`, pas `null`. Sans vérification, l'accès à `saisie.Length` lève alors une `NullReferenceException` et le programme s'arrête.
+
+**Effet de `TreatWarningsAsErrors`.** Avec ce réglage, chaque avertissement est traité comme une erreur. Si un avertissement de nullabilité réapparaît, par exemple en remettant `string` à la place de `string?`, la compilation échoue et le programme ne peut pas être lancé tant que le problème n'est pas corrigé. On ne peut donc plus ignorer un risque de `null` : on est obligé de le traiter au moment où on écrit le code. On garde ce réglage pour la suite du TP.

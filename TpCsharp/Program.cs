@@ -1,19 +1,23 @@
-﻿var c1 = new PointC { X = 1 };
-var c2 = c1;
-c2.X = 9;
-Console.WriteLine($"classe : c1.X = {c1.X}");
+﻿Console.Write("Tape un texte : ");
+string? saisie = Console.ReadLine();
+Console.WriteLine($"Vous avez tapé {saisie?.Length ?? 0} caractères");
 
-var s1 = new PointS { X = 1 };
-var s2 = s1;
-s2.X = 9;
-Console.WriteLine($"struct : s1.X = {s1.X}");
+Console.Write("Tape un autre texte : ");
+string? saisie2 = Console.ReadLine();
+if (saisie2 is null)
+    Console.WriteLine("Aucune saisie : l'entrée est fermée.");
+else
+    Console.WriteLine($"Vous avez tapé {saisie2.Length} caractères");
 
-string a = "info";
-string b = string.Concat("in", "fo");
-Console.WriteLine(a == b);
-
-Console.WriteLine(0.1 + 0.2 == 0.3);
-Console.WriteLine(0.1m + 0.2m == 0.3m);
-
-class PointC { public int X; }
-struct PointS { public int X; }
+int age;
+while (true)
+{
+    Console.Write("Ton âge (entre 0 et 120) : ");
+    string? texte = Console.ReadLine();
+    if (texte is null)
+        return;
+    if (int.TryParse(texte, out age) && age is >= 0 and <= 120)
+        break;
+    Console.WriteLine("Saisie invalide, recommence.");
+}
+Console.WriteLine($"Tu as {age} ans.");
