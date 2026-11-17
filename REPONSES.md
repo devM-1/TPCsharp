@@ -40,3 +40,9 @@ Le suffixe m indique un littéral de type decimal. Un double stocke les nombres 
 **Pourquoi `Console.ReadLine()` peut renvoyer `null`.** `Console.ReadLine()` a pour type de retour `string?`. Elle renvoie `null` lorsqu'il n'y a plus rien à lire sur l'entrée standard : quand l'utilisateur ferme l'entrée avec Ctrl+D (Linux, macOS) ou Ctrl+Z puis Entrée (Windows), ou quand l'entrée est redirigée depuis un fichier dont on a atteint la fin. Il ne faut pas confondre ce cas avec une ligne vide : si l'utilisateur appuie seulement sur Entrée, on obtient la chaîne vide `""`, pas `null`. Sans vérification, l'accès à `saisie.Length` lève alors une `NullReferenceException` et le programme s'arrête.
 
 **Effet de `TreatWarningsAsErrors`.** Avec ce réglage, chaque avertissement est traité comme une erreur. Si un avertissement de nullabilité réapparaît, par exemple en remettant `string` à la place de `string?`, la compilation échoue et le programme ne peut pas être lancé tant que le problème n'est pas corrigé. On ne peut donc plus ignorer un risque de `null` : on est obligé de le traiter au moment où on écrit le code. On garde ce réglage pour la suite du TP.
+
+## 3. Contrôle et collections
+
+### 3.4
+
+**Lecture de `dico["Inconnu"]`.** La clé `"Inconnu"` n'existe pas dans le dictionnaire : l'indexeur lève donc une `KeyNotFoundException` à l'exécution, et le programme s'arrête si on ne l'attrape pas. C'est une différence avec Java, où `HashMap.get` renvoie simplement `null` pour une clé absente. Pour éviter l'exception, on utilise `TryGetValue` : la méthode renvoie `true` et place la liste dans sa variable `out` si la clé existe, et `false` sinon. On teste donc le résultat dans un `if`, sans exception et en une seule recherche dans le dictionnaire, alors qu'un `ContainsKey` suivi de l'indexeur en ferait deux.
