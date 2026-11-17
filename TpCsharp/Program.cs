@@ -1,34 +1,25 @@
 ﻿using Ecole;
+using Geometrie;
 
-var n1 = new Note("Lovelace", "Ada", "Algo", 15, 3);
-var n2 = new Note("Lovelace", "Ada", "Algo", 15, 3);
-Console.WriteLine(n1 == n2);
-Console.WriteLine(n1);
-var n3 = n1 with { Valeur = 18 };
-Console.WriteLine(n3);
-Console.WriteLine(n1 == n3);
+var p1 = new Point2D(1, 2);
+var p2 = p1;
+p2 = p2.Deplacer(5, 5);
+Console.WriteLine($"p1 = {p1}, p2 = {p2}");
 
-var e1 = new Etudiant("Lovelace", "Ada", 4);
-var e2 = new Etudiant("Lovelace", "Ada", 4);
-Console.WriteLine(e1 == e2);
+var cercle = new Cercle(1) { Centre = new Point2D(2, 3) };
+Point2D centre = cercle.Centre;
+centre = centre.Deplacer(10, 10);
+Console.WriteLine($"Centre du cercle : {cercle.Centre}, copie déplacée : {centre}");
 
-var promo = new Promo("M1 Info");
-try
-{
-    List<Note> notes = LecteurNotes.LireFichier("notes.csv");
-    foreach (var note in notes)
-    {
-        Etudiant? etudiant = promo.Chercher(note.Nom);
-        if (etudiant is null)
-        {
-            etudiant = new Etudiant(note.Nom, note.Prenom, 4);
-            promo.Inscrire(etudiant);
-        }
-        etudiant.AjouterNote(note.Valeur, note.Coef);
-    }
-    promo.AfficherReleve();
-}
-catch (FileNotFoundException e)
-{
-    Console.Error.WriteLine($"Le fichier {e.FileName} est introuvable.");
-}
+var ada1 = new Etudiant("Lovelace", "Ada", 4) { Naissance = new DateOnly(1815, 12, 10) };
+var ada2 = new Etudiant("Lovelace", "Ada", 5) { Naissance = new DateOnly(1815, 12, 10) };
+var alan = new Etudiant("Turing", "Alan", 4) { Naissance = new DateOnly(1912, 6, 23) };
+
+Console.WriteLine(ada1.Equals(ada2));
+Console.WriteLine(ada1 == ada2);
+
+var ensemble = new HashSet<Etudiant>();
+Console.WriteLine(ensemble.Add(ada1));
+Console.WriteLine(ensemble.Add(ada2));
+Console.WriteLine(ensemble.Add(alan));
+Console.WriteLine($"Nombre d'étudiants dans l'ensemble : {ensemble.Count}");

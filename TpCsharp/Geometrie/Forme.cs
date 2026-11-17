@@ -8,6 +8,7 @@ public abstract class Forme : IDessinable, IComparable<Forme>
     }
 
     public string Nom { get; }
+    public Point2D Centre { get; init; }
 
     public abstract double Aire();
     public abstract double Perimetre();

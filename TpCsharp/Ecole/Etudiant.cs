@@ -1,6 +1,6 @@
 namespace Ecole;
 
-public class Etudiant
+public class Etudiant : IEquatable<Etudiant>
 {
     private readonly List<double> _notes = [];
     private readonly List<int> _coefs = [];
@@ -73,4 +73,15 @@ public class Etudiant
         string niveau = Annee <= 3 ? $"L{Annee}" : $"M{Annee - 3}";
         return $"{NomComplet} ({niveau}) : {Moyenne():F2}";
     }
+
+    public bool Equals(Etudiant? autre)
+    {
+        if (autre is null)
+            return false;
+        return Nom == autre.Nom && Prenom == autre.Prenom && Naissance == autre.Naissance;
+    }
+
+    public override bool Equals(object? obj) => Equals(obj as Etudiant);
+
+    public override int GetHashCode() => HashCode.Combine(Nom, Prenom, Naissance);
 }
