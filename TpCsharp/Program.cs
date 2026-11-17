@@ -1,39 +1,22 @@
-﻿using Ecole;
+﻿using Geometrie;
 
-var ada = new Etudiant("Lovelace", "Ada", 4)
-{
-    Naissance = new DateOnly(1815, 12, 10)
-};
-ada.AjouterNote(15);
-ada.AjouterNote(16);
-Console.WriteLine(ada);
-ada.Annee = 5;
-// ada.Nom = "Byron";
-// ada.Naissance = new DateOnly(1816, 1, 1);
+List<Forme> formes = [new Cercle(1), new Rectangle(2, 5), new Carre(3), new Cercle(2.5)];
+formes.Sort();
+foreach (var forme in formes)
+    forme.Dessiner();
 
-try
+double aireTotale = 0;
+Forme plusGrandPerimetre = formes[0];
+foreach (var forme in formes)
 {
-    ada.AjouterNote(25);
+    aireTotale += forme.Aire();
+    if (forme.Perimetre() > plusGrandPerimetre.Perimetre())
+        plusGrandPerimetre = forme;
 }
-catch (ArgumentOutOfRangeException e)
-{
-    Console.WriteLine($"Erreur : {e.Message}");
-}
+Console.WriteLine($"Aire totale : {aireTotale:F2}");
+Console.WriteLine($"Plus grand périmètre : {plusGrandPerimetre.Decrire()}");
 
-var alan = new Etudiant("Turing", "Alan", 4);
-alan.AjouterNote(9);
-alan.AjouterNote(12);
-
-var grace = new Etudiant("Hopper", "Grace", 4);
-grace.AjouterNote(17);
-grace.AjouterNote(18.5);
-
-var promo = new Promo("M1 Info");
-promo.Inscrire(ada);
-promo.Inscrire(alan);
-promo.Inscrire(grace);
-
-Console.WriteLine($"Recherche de Turing : {promo.Chercher("Turing")?.NomComplet ?? "introuvable"}");
-Console.WriteLine($"Major : {promo.Major()}");
-Console.WriteLine($"Moyenne générale : {promo.MoyenneGenerale():F2}");
-promo.AfficherReleve();
+Cercle c = new Cercle(1);
+Forme f = c;
+Console.WriteLine(c.Decrire());
+Console.WriteLine(f.Decrire());

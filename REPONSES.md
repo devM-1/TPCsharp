@@ -60,3 +60,21 @@ Le suffixe m indique un littéral de type decimal. Un double stocke les nombres 
 ### 4.2
 
 **Visibilité par défaut.** Après avoir retiré `public` devant `class Promo`, le programme compile toujours. Une classe déclarée sans modificateur est `internal` par défaut : elle est visible partout dans le même assembly, c'est-à-dire dans le même projet, ce qui est le cas de `Program.cs`. Cela poserait problème avec un projet de tests séparé comme `TpCsharp.Tests` : il produit un autre assembly, qui ne pourrait pas voir `Promo`, et les tests ne compileraient pas. Il faudrait alors remettre `public`, ou autoriser explicitement le projet de tests avec `InternalsVisibleTo`. C'est l'équivalent de la visibilité « package » par défaut en Java, mais à l'échelle du projet plutôt que du paquetage.
+
+## 5. Héritage et interfaces : les formes
+
+### 5.1
+
+**Dérivation d'une classe `sealed`.** Quand on essaie de dériver une classe de `Carre`, le compilateur refuse avec l'erreur CS0509 : on ne peut pas dériver d'un type `sealed`. Le mot-clé `sealed` interdit tout héritage depuis la classe, comme `final` sur une classe en Java.
+
+### 5.2
+
+**Ordre d'affichage et rayon.** Les formes s'affichent bien par aire croissante : le cercle de rayon 1 (3,14), le carré (9,00), le rectangle (10,00), puis le cercle de rayon 2,5 (19,63). En effet, `formes.Sort()` utilise la méthode `CompareTo` de `IComparable<Forme>`, qui compare les aires. Le texte des cercles contient bien le rayon. `Dessiner()` est écrite une seule fois, dans `Forme`, et appelle `Decrire()`. Comme `Decrire` est `virtual` et redéfinie avec `override` dans `Cercle`, c'est la version de l'objet réel qui est exécutée.
+
+**Aire totale et plus grand périmètre.** En parcourant la liste avec une boucle, on obtient une aire totale de 41,78. La forme de plus grand périmètre est le cercle de rayon 2,5, avec un périmètre de 15,71.
+
+### 5.3
+
+**Suppression de `virtual`.** Le compilateur refuse la méthode de `Cercle` avec l'erreur CS0506 : on ne peut pas redéfinir le membre hérité `Forme.Decrire()`, car il n'est marqué ni `virtual`, ni `abstract`, ni `override`. En C#, une méthode n'est pas redéfinissable par défaut : il faut l'autoriser explicitement avec `virtual`.
+
+**Différence entre `new` et `override`.** Avec `new`, les deux lignes n'affichent pas la même chose : `c.Decrire()` affiche le rayon, mais pas `f.Decrire()`, alors que les deux variables désignent le même objet. Avec `new`, la méthode de `Cercle` masque celle de `Forme` sans la remplacer : le compilateur choisit la méthode d'après le type déclaré de la variable. Comme `c` est déclarée `Cercle`, on appelle la version de `Cercle` ; comme `f` est déclarée `Forme`, on appelle celle de `Forme`. Pour la même raison, les cercles affichés par `Dessiner()` perdent leur rayon. Avec `override`, la méthode est redéfinie : le choix se fait à l'exécution, d'après le type réel de l'objet, et les deux lignes affichent le rayon. En Java, toutes les méthodes d'instance sont virtuelles par défaut, et il n'existe pas de masquage de méthode d'instance : le code se comporterait comme avec `override`, et les deux lignes afficheraient la version de `Cercle`.
