@@ -3,6 +3,7 @@ namespace Ecole;
 public class Etudiant
 {
     private readonly List<double> _notes = [];
+    private readonly List<int> _coefs = [];
     private int _annee;
 
     public Etudiant(string nom, string prenom, int annee)
@@ -33,11 +34,14 @@ public class Etudiant
     public int NbNotes => _notes.Count;
     public IReadOnlyList<double> Notes => _notes.AsReadOnly();
 
-    public void AjouterNote(double n)
+    public void AjouterNote(double n, int coef = 1)
     {
         if (n is < 0 or > 20)
             throw new ArgumentOutOfRangeException(nameof(n), "La note doit être comprise entre 0 et 20.");
+        if (coef < 1)
+            throw new ArgumentOutOfRangeException(nameof(coef), "Le coefficient doit être au moins égal à 1.");
         _notes.Add(n);
+        _coefs.Add(coef);
     }
 
     public double Moyenne()
@@ -48,6 +52,20 @@ public class Etudiant
         foreach (double n in _notes)
             somme += n;
         return somme / _notes.Count;
+    }
+
+    public double MoyennePonderee()
+    {
+        if (_notes.Count == 0)
+            return 0;
+        double somme = 0;
+        int totalCoefs = 0;
+        for (int i = 0; i < _notes.Count; i++)
+        {
+            somme += _notes[i] * _coefs[i];
+            totalCoefs += _coefs[i];
+        }
+        return somme / totalCoefs;
     }
 
     public override string ToString()

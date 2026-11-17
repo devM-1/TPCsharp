@@ -51,6 +51,6 @@ public class Promo
     {
         Console.WriteLine($"Relevé de la promo {Nom}");
         foreach (var e in _etudiants)
-            Console.WriteLine($"{e} - {Bareme.Mention(e.Moyenne())}");
+            Console.WriteLine($"{e} - {Bareme.Mention(e.Moyenne())} - moyenne pondérée {e.MoyennePonderee():F2}");
     }
 }
