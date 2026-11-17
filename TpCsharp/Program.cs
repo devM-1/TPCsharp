@@ -1,54 +1,39 @@
-﻿// Statistiques sur une liste de notes
-List<double> listeNotes = [12, 15.5, 9, 18];
+﻿using Ecole;
 
-double somme = 0;
-double min = listeNotes[0];
-double max = listeNotes[0];
-foreach (double n in listeNotes)
+var ada = new Etudiant("Lovelace", "Ada", 4)
 {
-    somme += n;
-    if (n < min) min = n;
-    if (n > max) max = n;
-}
-double moyenne = somme / listeNotes.Count;
-Console.WriteLine($"Moyenne : {moyenne:F2} ({Bareme.Mention(moyenne)}), min : {min}, max : {max}");
-
-// Notes par étudiant
-Dictionary<string, List<double>> dico = new()
-{
-    ["Ada"] = [15, 16, 14],
-    ["Alan"] = [9, 12],
-    ["Grace"] = [17, 18.5, 16]
+    Naissance = new DateOnly(1815, 12, 10)
 };
-dico["Alan"].Add(14);
+ada.AjouterNote(15);
+ada.AjouterNote(16);
+Console.WriteLine(ada);
+ada.Annee = 5;
+// ada.Nom = "Byron";
+// ada.Naissance = new DateOnly(1816, 1, 1);
 
-foreach (var (nom, notes) in dico)
+try
 {
-    double total = 0;
-    foreach (double n in notes)
-        total += n;
-    double moy = total / notes.Count;
-    Console.WriteLine($"{nom} : {notes.Count} notes, moyenne {moy:F2}, {Bareme.Mention(moy)}");
+    ada.AjouterNote(25);
+}
+catch (ArgumentOutOfRangeException e)
+{
+    Console.WriteLine($"Erreur : {e.Message}");
 }
 
-// Clé absente
-if (dico.TryGetValue("Inconnu", out var notesInconnu))
-    Console.WriteLine($"Inconnu a {notesInconnu.Count} notes");
-else
-    Console.WriteLine("Aucun étudiant nommé Inconnu.");
+var alan = new Etudiant("Turing", "Alan", 4);
+alan.AjouterNote(9);
+alan.AjouterNote(12);
 
-// Filtrage par motif
-object?[] valeurs = [4, 7, "", "bonjour", listeNotes, null, 3.14];
-foreach (var v in valeurs)
-    Console.WriteLine(Decrire(v));
+var grace = new Etudiant("Hopper", "Grace", 4);
+grace.AjouterNote(17);
+grace.AjouterNote(18.5);
 
-static string Decrire(object? o) => o switch
-{
-    null => "null",
-    int n when n % 2 == 0 => "entier pair",
-    int => "entier impair",
-    string { Length: 0 } => "chaîne vide",
-    string s => $"chaîne de {s.Length} caractères",
-    List<double> l => $"liste de {l.Count} éléments",
-    _ => "autre"
-};
+var promo = new Promo("M1 Info");
+promo.Inscrire(ada);
+promo.Inscrire(alan);
+promo.Inscrire(grace);
+
+Console.WriteLine($"Recherche de Turing : {promo.Chercher("Turing")?.NomComplet ?? "introuvable"}");
+Console.WriteLine($"Major : {promo.Major()}");
+Console.WriteLine($"Moyenne générale : {promo.MoyenneGenerale():F2}");
+promo.AfficherReleve();
