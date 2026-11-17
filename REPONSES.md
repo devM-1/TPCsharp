@@ -46,3 +46,17 @@ Le suffixe m indique un littéral de type decimal. Un double stocke les nombres 
 ### 3.4
 
 **Lecture de `dico["Inconnu"]`.** La clé `"Inconnu"` n'existe pas dans le dictionnaire : l'indexeur lève donc une `KeyNotFoundException` à l'exécution, et le programme s'arrête si on ne l'attrape pas. C'est une différence avec Java, où `HashMap.get` renvoie simplement `null` pour une clé absente. Pour éviter l'exception, on utilise `TryGetValue` : la méthode renvoie `true` et place la liste dans sa variable `out` si la clé existe, et `false` sinon. On teste donc le résultat dans un `if`, sans exception et en une seule recherche dans le dictionnaire, alors qu'un `ContainsKey` suivi de l'indexeur en ferait deux.
+
+## 4. Classe Etudiant et propriétés
+
+### 4.1
+
+**Redéfinition de `ToString`.** Pour redéfinir `ToString`, déclarée `virtual` dans `object`, on doit utiliser le mot-clé `override`. Si on l'oublie, le compilateur affiche l'avertissement CS0114 : la méthode de `Etudiant` masque la méthode héritée au lieu de la redéfinir. Avec `TreatWarningsAsErrors`, cet avertissement devient une erreur et le projet ne compile plus. Sans ce réglage, le programme compilerait, mais `Console.WriteLine(ada)`, qui appelle `ToString` à travers une référence de type `object`, exécuterait la version d'`object` et afficherait seulement `Ecole.Etudiant`.
+
+**Accès à `ada._notes`.** Le compilateur refuse la ligne avec l'erreur CS0122 : le membre `Etudiant._notes` est inaccessible en raison de son niveau de protection. Un champ déclaré `private` n'est accessible que depuis l'intérieur de la classe `Etudiant`.
+
+**Pourquoi ne pas exposer la liste directement.** Si on exposait `_notes` en propriété publique de type `List<double>`, n'importe quel code pourrait ajouter, supprimer ou vider les notes (`ada.Notes.Add(45)`, `ada.Notes.Clear()`) sans passer par `AjouterNote`. La vérification des bornes 0 à 20 serait contournée, et l'objet pourrait se retrouver dans un état incohérent. On propose donc une propriété `public IReadOnlyList<double> Notes => _notes.AsReadOnly();`. Elle permet de lire les notes (nombre, accès par indice, parcours avec `foreach`) sans pouvoir les modifier. On renvoie `_notes.AsReadOnly()` plutôt que `_notes` : avec `_notes`, un appelant pourrait reconvertir la référence en `List<double>` et modifier la liste quand même.
+
+### 4.2
+
+**Visibilité par défaut.** Après avoir retiré `public` devant `class Promo`, le programme compile toujours. Une classe déclarée sans modificateur est `internal` par défaut : elle est visible partout dans le même assembly, c'est-à-dire dans le même projet, ce qui est le cas de `Program.cs`. Cela poserait problème avec un projet de tests séparé comme `TpCsharp.Tests` : il produit un autre assembly, qui ne pourrait pas voir `Promo`, et les tests ne compileraient pas. Il faudrait alors remettre `public`, ou autoriser explicitement le projet de tests avec `InternalsVisibleTo`. C'est l'équivalent de la visibilité « package » par défaut en Java, mais à l'échelle du projet plutôt que du paquetage.
