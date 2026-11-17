@@ -3,88 +3,64 @@
 ## 1. Premier projet
 
 ### 1.2
-
-Le projet vise .NET 10 (`<TargetFramework>net10.0</TargetFramework>`). Les options `Nullable` et `ImplicitUsings` sont toutes les deux activées (`enable`).
-
-- `Nullable` active l'analyse de nullabilité : le compilateur distingue `string`, qui ne doit jamais valoir `null`, de `string?`, qui peut valoir `null`, et il avertit dès qu'une valeur potentiellement nulle est utilisée sans vérification.
-- `ImplicitUsings` ajoute automatiquement des `global using` vers les espaces de noms les plus courants (`System`, `System.IO`, `System.Collections.Generic`, `System.Linq`, etc.). C'est pour cela qu'on peut utiliser `Console` sans écrire `using System;`, de la même manière que `java.lang` est importé automatiquement en Java.
+Le projet vise .NET 10 (net10.0), et les options Nullable et ImplicitUsings sont activées. Avec Nullable, le compilateur signale les valeurs qui peuvent être null. ImplicitUsings ajoute automatiquement les using courants : c'est pour cela qu'on peut utiliser Console sans écrire using System;.
 
 ### 1.4
-
-Le fichier `TpCsharp.dll` contient le code compilé en langage intermédiaire (IL), et non en code machine. Il correspond au bytecode Java : à un `.class` ou plutôt, puisqu'il regroupe tout le projet, à un `.jar`. On l'exécute avec `dotnet TpCsharp.dll`, comme on lancerait `java -jar` : la CLR joue le rôle de la JVM et compile l'IL en code machine pendant l'exécution (compilation JIT). Le même fichier s'exécute donc sous Windows, Linux ou macOS dès que .NET est installé.
+Le .dll contient du code intermédiaire (IL), pas du code machine. C'est l'équivalent d'un .jar en Java : la CLR l'exécute comme la JVM exécute le bytecode, en le compilant pendant l'exécution (JIT).
 
 ### 1.5
-
-Avec `dotnet run hello.cs`, on n'a pas besoin de fichier `.csproj` : .NET 10 crée un projet virtuel à partir du fichier seul. Aucun dossier `bin/` ni `obj/` n'apparaît à côté du fichier, car le résultat de la compilation est placé dans un dossier temporaire. C'est pratique pour un script ou un test rapide ; si le programme grandit, on peut le transformer en vrai projet avec `dotnet project convert hello.cs`. C'est l'équivalent de `java Hello.java`, qui exécute directement un fichier source sans passer par `javac`.
+Un fichier seul s'exécute sans .csproj : .NET crée un projet virtuel et compile dans un dossier temporaire, donc aucun dossier bin/ ni obj/ n'apparaît. C'est l'équivalent de java Hello.java, pratique pour un petit script.
 
 ## 2. Types, chaînes et null
 
 ### 2.1
+**c1.X et s1.X.** On obtient c1.X = 9 et s1.X = 1. Une classe est un type référence : c2 = c1 copie la référence, donc les deux variables désignent le même objet. Une structure est un type valeur : s2 = s1 copie les données, donc s2 est indépendante de s1.
 
-- Pourquoi c1.X et s1.X n'ont pas la même valeur. 
-On obtient c1.X = 9 et s1.X = 1. 
-PointC est une classe, donc un type référence : la variable c1 ne contient pas l'objet mais une référence vers lui. L'affectation c2 = c1 copie cette référence,si bien que c1 et c2 désignent le même objet, et modifier c2.X modifie aussi ce qu'on lit avec c1.X.
-PointS est une structure, donc un type valeur : l'affectation s2 = s1 copie toute la valeur, champ par champ. s2 est une copie indépendante, et la modifier ne touche pas s1.
-En Java, tous les objets se comportent comme PointC ; seuls les types primitifs comme int se comportent comme PointS.
+**a == b.** En Java, == compare les références et donnerait false, car string.Concat crée un nouvel objet. En C#, string redéfinit == pour comparer le contenu, d'où True.
 
-- a == b en Java et en C#. 
-En Java, a == b donnerait false : sur deux String, l'opérateur == compare les références, et string.Concat construit une nouvelle chaîne à l'exécution, distincte du littéral "info". Il faudrait utiliser a.equals(b) pour comparer le contenu. En C#, on obtient True, car le type string redéfinit l'opérateur == pour comparer le contenu des chaînes. Les chaînes restent pourtant des types référence et immuables, comme en Java : seule la signification de == change.
-
-- Le suffixe m et le choix entre double et decimal.
-Le suffixe m indique un littéral de type decimal. Un double stocke les nombres en base 2, où 0.1 et 0.2 n'ont pas de représentation exacte : leur somme vaut 0.30000000000000004, d'où False. Un decimal stocke les nombres en base 10, donc 0.1m + 0.2m vaut exactement 0.3m, d'où True. Le choix est important dans les programmes financiers ou comptables (banque, facturation, paie), où les montants doivent être exacts au centime près : on utilise alors decimal, l'équivalent de BigDecimal en Java. Pour les calculs scientifiques, physiques ou graphiques, on garde double, plus rapide et capable de représenter des valeurs bien plus grandes, quitte à comparer avec une tolérance plutôt qu'avec ==.
+**Suffixe m.** Il désigne un decimal, stocké en base 10 : 0.1m + 0.2m vaut exactement 0.3m. Un double est stocké en base 2, ce qui provoque une erreur d'arrondi, d'où False. On choisit decimal pour les montants (banque, facturation) et double pour les calculs scientifiques.
 
 ### 2.2
+**Avertissements.** On obtient CS8600, car on range un string? dans un string, et CS8602, car on lit saisie.Length alors que saisie peut valoir null.
 
-**Avertissements du compilateur.** On obtient deux avertissements : CS8600 sur la première ligne, car on affecte le résultat de `Console.ReadLine()`, de type `string?`, à une variable de type `string` ; et CS8602 sur la deuxième, car on accède à `saisie.Length` alors que `saisie` peut valoir `null`.
+**ReadLine() et null.** ReadLine() renvoie null quand l'entrée standard est fermée, c'est-à-dire quand il n'y a plus rien à lire : Ctrl+D sous Linux et macOS, Ctrl+Z sous Windows, ou fin d'un fichier redirigé. Une ligne vide donne "", pas null.
 
-**Pourquoi `Console.ReadLine()` peut renvoyer `null`.** `Console.ReadLine()` a pour type de retour `string?`. Elle renvoie `null` lorsqu'il n'y a plus rien à lire sur l'entrée standard : quand l'utilisateur ferme l'entrée avec Ctrl+D (Linux, macOS) ou Ctrl+Z puis Entrée (Windows), ou quand l'entrée est redirigée depuis un fichier dont on a atteint la fin. Il ne faut pas confondre ce cas avec une ligne vide : si l'utilisateur appuie seulement sur Entrée, on obtient la chaîne vide `""`, pas `null`. Sans vérification, l'accès à `saisie.Length` lève alors une `NullReferenceException` et le programme s'arrête.
-
-**Effet de `TreatWarningsAsErrors`.** Avec ce réglage, chaque avertissement est traité comme une erreur. Si un avertissement de nullabilité réapparaît, par exemple en remettant `string` à la place de `string?`, la compilation échoue et le programme ne peut pas être lancé tant que le problème n'est pas corrigé. On ne peut donc plus ignorer un risque de `null` : on est obligé de le traiter au moment où on écrit le code. On garde ce réglage pour la suite du TP.
+**TreatWarningsAsErrors.** Les avertissements deviennent des erreurs : si un problème de nullabilité réapparaît, le projet ne compile plus.
 
 ## 3. Contrôle et collections
 
 ### 3.4
-
-**Lecture de `dico["Inconnu"]`.** La clé `"Inconnu"` n'existe pas dans le dictionnaire : l'indexeur lève donc une `KeyNotFoundException` à l'exécution, et le programme s'arrête si on ne l'attrape pas. C'est une différence avec Java, où `HashMap.get` renvoie simplement `null` pour une clé absente. Pour éviter l'exception, on utilise `TryGetValue` : la méthode renvoie `true` et place la liste dans sa variable `out` si la clé existe, et `false` sinon. On teste donc le résultat dans un `if`, sans exception et en une seule recherche dans le dictionnaire, alors qu'un `ContainsKey` suivi de l'indexeur en ferait deux.
+dico["Inconnu"] lève une KeyNotFoundException, alors qu'en Java, get renverrait null. Avec TryGetValue, on obtient simplement false, sans exception, si la clé n'existe pas.
 
 ## 4. Classe Etudiant et propriétés
 
 ### 4.1
+**override.** On redéfinit ToString avec override. Sans ce mot-clé, la méthode masque celle d'object au lieu de la redéfinir : on obtient l'avertissement CS0114, transformé en erreur ici. Sans TreatWarningsAsErrors, le programme compilerait, mais Console.WriteLine(ada) afficherait Ecole.Etudiant.
 
-**Redéfinition de `ToString`.** Pour redéfinir `ToString`, déclarée `virtual` dans `object`, on doit utiliser le mot-clé `override`. Si on l'oublie, le compilateur affiche l'avertissement CS0114 : la méthode de `Etudiant` masque la méthode héritée au lieu de la redéfinir. Avec `TreatWarningsAsErrors`, cet avertissement devient une erreur et le projet ne compile plus. Sans ce réglage, le programme compilerait, mais `Console.WriteLine(ada)`, qui appelle `ToString` à travers une référence de type `object`, exécuterait la version d'`object` et afficherait seulement `Ecole.Etudiant`.
+**ada._notes.** On obtient l'erreur CS0122 : le champ est private, donc inaccessible en dehors de la classe.
 
-**Accès à `ada._notes`.** Le compilateur refuse la ligne avec l'erreur CS0122 : le membre `Etudiant._notes` est inaccessible en raison de son niveau de protection. Un champ déclaré `private` n'est accessible que depuis l'intérieur de la classe `Etudiant`.
-
-**Pourquoi ne pas exposer la liste directement.** Si on exposait `_notes` en propriété publique de type `List<double>`, n'importe quel code pourrait ajouter, supprimer ou vider les notes (`ada.Notes.Add(45)`, `ada.Notes.Clear()`) sans passer par `AjouterNote`. La vérification des bornes 0 à 20 serait contournée, et l'objet pourrait se retrouver dans un état incohérent. On propose donc une propriété `public IReadOnlyList<double> Notes => _notes.AsReadOnly();`. Elle permet de lire les notes (nombre, accès par indice, parcours avec `foreach`) sans pouvoir les modifier. On renvoie `_notes.AsReadOnly()` plutôt que `_notes` : avec `_notes`, un appelant pourrait reconvertir la référence en `List<double>` et modifier la liste quand même.
+**Liste publique.** Exposer directement la List<double> permettrait d'ajouter ou de supprimer des notes sans passer par AjouterNote, donc sans contrôle des bornes. On propose public IReadOnlyList<double> Notes => _notes.AsReadOnly();, qui permet de lire les notes sans pouvoir les modifier.
 
 ### 4.2
-
-**Visibilité par défaut.** Après avoir retiré `public` devant `class Promo`, le programme compile toujours. Une classe déclarée sans modificateur est `internal` par défaut : elle est visible partout dans le même assembly, c'est-à-dire dans le même projet, ce qui est le cas de `Program.cs`. Cela poserait problème avec un projet de tests séparé comme `TpCsharp.Tests` : il produit un autre assembly, qui ne pourrait pas voir `Promo`, et les tests ne compileraient pas. Il faudrait alors remettre `public`, ou autoriser explicitement le projet de tests avec `InternalsVisibleTo`. C'est l'équivalent de la visibilité « package » par défaut en Java, mais à l'échelle du projet plutôt que du paquetage.
+Sans public, la classe est internal par défaut. Le programme compile toujours, car Program.cs est dans le même projet, mais un projet de tests séparé ne pourrait pas utiliser Promo.
 
 ## 5. Héritage et interfaces : les formes
 
 ### 5.1
-
-**Dérivation d'une classe `sealed`.** Quand on essaie de dériver une classe de `Carre`, le compilateur refuse avec l'erreur CS0509 : on ne peut pas dériver d'un type `sealed`. Le mot-clé `sealed` interdit tout héritage depuis la classe, comme `final` sur une classe en Java.
+Dériver une classe de Carre provoque l'erreur CS0509 : une classe sealed ne peut pas être héritée. C'est l'équivalent de final en Java.
 
 ### 5.2
-
-**Ordre d'affichage et rayon.** Les formes s'affichent bien par aire croissante : le cercle de rayon 1 (3,14), le carré (9,00), le rectangle (10,00), puis le cercle de rayon 2,5 (19,63). En effet, `formes.Sort()` utilise la méthode `CompareTo` de `IComparable<Forme>`, qui compare les aires. Le texte des cercles contient bien le rayon. `Dessiner()` est écrite une seule fois, dans `Forme`, et appelle `Decrire()`. Comme `Decrire` est `virtual` et redéfinie avec `override` dans `Cercle`, c'est la version de l'objet réel qui est exécutée.
-
-**Aire totale et plus grand périmètre.** En parcourant la liste avec une boucle, on obtient une aire totale de 41,78. La forme de plus grand périmètre est le cercle de rayon 2,5, avec un périmètre de 15,71.
+Les formes s'affichent bien par aire croissante, car Sort() utilise CompareTo, qui compare les aires. Le texte des cercles contient le rayon, car Decrire est virtual et redéfinie dans Cercle. On obtient une aire totale de 41,78, et la forme de plus grand périmètre est le cercle de rayon 2,5 (15,71).
 
 ### 5.3
+**Sans virtual.** On obtient l'erreur CS0506 : on ne peut redéfinir qu'une méthode virtual, abstract ou override.
 
-**Suppression de `virtual`.** Le compilateur refuse la méthode de `Cercle` avec l'erreur CS0506 : on ne peut pas redéfinir le membre hérité `Forme.Decrire()`, car il n'est marqué ni `virtual`, ni `abstract`, ni `override`. En C#, une méthode n'est pas redéfinissable par défaut : il faut l'autoriser explicitement avec `virtual`.
-
-**Différence entre `new` et `override`.** Avec `new`, les deux lignes n'affichent pas la même chose : `c.Decrire()` affiche le rayon, mais pas `f.Decrire()`, alors que les deux variables désignent le même objet. Avec `new`, la méthode de `Cercle` masque celle de `Forme` sans la remplacer : le compilateur choisit la méthode d'après le type déclaré de la variable. Comme `c` est déclarée `Cercle`, on appelle la version de `Cercle` ; comme `f` est déclarée `Forme`, on appelle celle de `Forme`. Pour la même raison, les cercles affichés par `Dessiner()` perdent leur rayon. Avec `override`, la méthode est redéfinie : le choix se fait à l'exécution, d'après le type réel de l'objet, et les deux lignes affichent le rayon. En Java, toutes les méthodes d'instance sont virtuelles par défaut, et il n'existe pas de masquage de méthode d'instance : le code se comporterait comme avec `override`, et les deux lignes afficheraient la version de `Cercle`.
+**new ou override.** Avec new, c.Decrire() affiche le rayon mais pas f.Decrire(), alors que les deux variables désignent le même objet : la méthode est choisie selon le type déclaré de la variable (masquage). Avec override, elle est choisie selon le type réel de l'objet (redéfinition), et les deux lignes affichent le rayon. En Java, les méthodes sont virtuelles par défaut : les deux lignes afficheraient aussi le rayon.
 
 ## 6. Records et exceptions : un fichier de notes
 
 ### 6.1
-
-**Égalité entre records et entre objets `Etudiant`.** Deux notes créées avec les mêmes valeurs sont égales : `n1 == n2` affiche `True`. Pour un `record`, le compilateur génère une égalité par valeur, qui compare une à une toutes les propriétés. Il génère aussi un `ToString` lisible (`Note { Nom = Lovelace, Prenom = Ada, ... }`) et la copie avec `with`, qui crée un nouvel objet en modifiant seulement certaines propriétés, sans toucher à l'original. En revanche, `==` entre deux objets `Etudiant` ayant les mêmes données affiche `False`. `Etudiant` est une classe : sans redéfinition, `==` compare les références, et deux appels à `new` créent deux objets distincts en mémoire, même si leur contenu est identique.
+Deux records identiques sont égaux (True), car un record compare ses valeurs. Deux objets Etudiant avec les mêmes données ne le sont pas (False), car pour une classe, == compare les références. with crée une copie modifiée sans changer l'original.
 
 ### 6.6
-
-**Moyenne pondérée.** On place le calcul dans la classe `Etudiant`, dans une méthode `MoyennePonderee()`. C'est elle qui possède les notes, et la liste `_notes` est privée : aucune autre classe ne peut y accéder. `Promo` se contente d'appeler cette méthode pour afficher le relevé. Il faut cependant modifier `Etudiant` pour qu'il conserve le coefficient de chaque note. On ajoute un paramètre `coef` à `AjouterNote`, avec 1 comme valeur par défaut pour que les appels existants restent valides, et on stocke les coefficients dans une liste privée `_coefs`, dans le même ordre que les notes. La méthode `MoyennePonderee()` divise ensuite la somme des notes multipliées par leur coefficient par la somme des coefficients. Par exemple, pour Alan Turing (9 coefficient 3 et 12 coefficient 2), on obtient 10,20 au lieu d'une moyenne simple de 10,50.
+On place le calcul dans Etudiant, puisque c'est cette classe qui possède les notes. Il faut y conserver le coefficient de chaque note : on ajoute un paramètre coef à AjouterNote, et une méthode MoyennePonderee() qui fait le calcul.
