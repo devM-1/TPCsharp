@@ -28,7 +28,10 @@ foreach (var c in lignesInvalides)
         : $"La ligne « {string.Join(',', c)} » est écartée.");
 
 
-Console.WriteLine($"{notes.Count} notes valides et {inscrits.Count} inscrits.");    
+Console.WriteLine($"{notes.Count} notes valides et {inscrits.Count} inscrits.");  
+
+Exercice1.Executer(notes);
+
 
 static Note? Parser(string ligne)
 {
@@ -39,3 +42,4 @@ static Note? Parser(string ligne)
     if (!int.TryParse(c[4], out var coef)) return null;
     return new Note(c[0], c[1], c[2], v, coef);
 }
+
