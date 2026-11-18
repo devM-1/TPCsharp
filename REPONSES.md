@@ -64,3 +64,11 @@ Deux records identiques sont égaux (True), car un record compare ses valeurs. D
 
 ### 6.6
 On place le calcul dans Etudiant, puisque c'est cette classe qui possède les notes. Il faut y conserver le coefficient de chaque note : on ajoute un paramètre coef à AjouterNote, et une méthode MoyennePonderee() qui fait le calcul.
+
+
+# TP — C# séance 2 : LINQ — réponses
+
+## 0. Mise en place
+
+### 0.2
+Avec Where(n => n is not null), le résultat reste de type IEnumerable<Note?> : Where retire des éléments mais ne change pas leur type, donc le compilateur considère toujours que chaque note peut être null. Avec OfType<Note>(), on obtient un IEnumerable<Note>. Les null sont écartés et le type n'est plus nullable, ce qui permet d'utiliser les notes sans avertissement ni vérification supplémentaire.
