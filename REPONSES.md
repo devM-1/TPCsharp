@@ -111,3 +111,24 @@ FirstOrDefault renvoie null, car Linus n'a pas de note en BD. Avec First, on obt
 Single sur Ada en Algo renvoie sa note de 15. Single sur toutes les notes d'Ada lève une InvalidOperationException : Single exige exactement un élément, et Ada a trois notes.
 
 Il existe bien une note inférieure à 10 (Any renvoie True). Toutes les notes de BD valent au moins 12 (All renvoie True) ; Linus n'a pas de note en BD, il n'est donc pas pris en compte. All renvoie True sur une séquence vide, puisqu'aucun élément ne contredit la condition.
+
+## 3. Regrouper et joindre
+
+### 3.1
+Les groupes sont Algo (Ada 15, Alan 9, Grace 18, Linus 11), BD (Ada 16, Alan 12, Grace 17, Barbara 13) et Reseau (Ada 14, Alan 11, Grace 12, Linus 16, Barbara 15). Un groupe est de type IGrouping<string, Note> : il possède une clé (Key, ici la matière) et c'est aussi une séquence qui contient les notes du groupe.
+
+Statistiques par matière, par moyenne décroissante : BD, 4 notes, moyenne 14,50 (min 12, max 17) ; Reseau, 5 notes, moyenne 13,60 (min 11, max 16) ; Algo, 4 notes, moyenne 13,25 (min 9, max 18). Les majors sont Grace en Algo et en BD, et Linus en Reseau.
+
+Moyennes pondérées : Grace 16,67, Ada 15,17, Barbara 13,67, Linus 12,25 et Alan 10,33.
+
+CountBy et GroupBy suivi de Count donnent le même résultat (Ada 3, Alan 3, Grace 3, Linus 2, Barbara 2). CountBy est plus court et plus efficace : il se contente de compter, alors que GroupBy construit d'abord des groupes qui gardent toutes les notes en mémoire.
+
+### 3.2
+Moyenne simple par promo : 13,00 pour M1 et 15,00 pour M2.
+
+Margaret Hamilton n'apparaît pas dans le relevé, car Join est une jointure interne : il ne garde que les inscrits qui ont au moins une note correspondante, et Margaret n'en a aucune. On la retrouve comme seule inscrite sans note avec Where et Any, avec GroupJoin (sa liste de notes est vide) ou avec LeftJoin (sa note associée vaut null).
+
+L'index construit avec ToLookup donne les trois notes de Grace : Algo 18, BD 17 et Reseau 12. Pour un prénom absent, il renvoie une séquence vide au lieu de lever une exception comme un dictionnaire.
+
+### 3.3
+SelectMany renvoie une seule séquence à plat de 13 valeurs, de type IEnumerable<double>. Avec Select à la place, on obtiendrait une séquence de 5 listes, de type 'IEnumerable<List<double>>', soit une liste par bulletin. La seconde forme de SelectMany garde le prénom à côté de chaque valeur et produit 13 paires, de (Ada, 15) à (Barbara, 15).

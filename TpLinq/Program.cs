@@ -6,20 +6,14 @@ List<Note> notes = File.ReadLines("notes.csv")
     .OfType<Note>()
     .ToList();
 
-var avecWhere = File.ReadLines("notes.csv")
-    .Skip(1)
-    .Select(Parser)
-    .Where(n => n is not null)
-    .ToList();
-
 List<Inscrit> inscrits = File.ReadLines("etudiants.csv")
     .Skip(1)
-    .Select(l => l.Split(','))
+    .Select(ligne => ligne.Split(','))
     .Select(c => new Inscrit(c[0], c[1], c[2]))
     .ToList();
 
 var lignesInvalides = File.ReadLines("notes.csv")
-   .Skip(1)
+    .Skip(1)
     .Where(ligne => Parser(ligne) is null)
     .Select(ligne => ligne.Split(','));
 foreach (var c in lignesInvalides)
@@ -27,12 +21,11 @@ foreach (var c in lignesInvalides)
         ? $"La ligne de {c[1]} en {c[2]} ({c[3]}) est écartée."
         : $"La ligne « {string.Join(',', c)} » est écartée.");
 
-
-Console.WriteLine($"{notes.Count} notes valides et {inscrits.Count} inscrits.");  
+Console.WriteLine($"{notes.Count} notes valides et {inscrits.Count} inscrits.");
 
 Step1.Executer(notes);
 Step2.Executer(notes);
-
+Step3.Executer(notes, inscrits);
 
 static Note? Parser(string ligne)
 {
@@ -43,4 +36,3 @@ static Note? Parser(string ligne)
     if (!int.TryParse(c[4], out var coef)) return null;
     return new Note(c[0], c[1], c[2], v, coef);
 }
-
