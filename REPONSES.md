@@ -131,4 +131,19 @@ Margaret Hamilton n'apparaît pas dans le relevé, car Join est une jointure int
 L'index construit avec ToLookup donne les trois notes de Grace : Algo 18, BD 17 et Reseau 12. Pour un prénom absent, il renvoie une séquence vide au lieu de lever une exception comme un dictionnaire.
 
 ### 3.3
-SelectMany renvoie une seule séquence à plat de 13 valeurs, de type IEnumerable<double>. Avec Select à la place, on obtiendrait une séquence de 5 listes, de type 'IEnumerable<List<double>>', soit une liste par bulletin. La seconde forme de SelectMany garde le prénom à côté de chaque valeur et produit 13 paires, de (Ada, 15) à (Barbara, 15).
+SelectMany renvoie une seule séquence à plat de 13 valeurs, de type IEnumerable<double>. Avec Select à la place, on obtiendrait une séquence de 5 listes, de type IEnumerable<List<double>>, soit une liste par bulletin. La seconde forme de SelectMany garde le prénom à côté de chaque valeur et produit 13 paires, de (Ada, 15) à (Barbara, 15).
+
+## 4. L'évaluation différée
+
+### 4.1
+Le programme affiche 6, puis 7, puis 8 / 7. La ligne Where ne calcule rien : elle prépare seulement la requête. Le premier Count() l'exécute sur les 13 notes de départ et trouve 6 notes d'au moins 15. Après l'ajout de la note de Margaret en Algo (19), le deuxième Count() relance la requête sur la liste modifiée et trouve 7 notes. ToList() exécute la requête immédiatement et fige le résultat : figees garde ses 7 notes, alors que bonnes, recalculée après l'ajout de la note de BD (20), en trouve 8.
+
+### 4.2
+En appelant Count() deux fois sur la requête, chaque note est testée deux fois, soit 26 tests, car la requête est réexécutée à chaque parcours. Avec ToList() d'abord, chaque note n'est testée qu'une fois (13 tests), et les appels suivants lisent simplement la liste.
+
+### 4.3
+Avec Count() > 0, les 13 notes sont testées. Avec Any(), une seule note est testée : Any s'arrête dès qu'il trouve un élément qui convient, et la première note (Ada en Algo, 15) convient déjà.
+
+### 4.4
+Le résultat est le même dans les deux cas : Ada 15, Barbara 15, Ada 16, Linus 16, Grace 17, Grace 18. Avec Where avant OrderBy, seules les 6 notes gardées passent par le tri. Avec OrderBy avant Where, les 13 notes sont triées avant d'être filtrées. Il vaut donc mieux filtrer avant de trier.
+
