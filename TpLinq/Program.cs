@@ -27,6 +27,7 @@ Step1.Executer(notes);
 Step2.Executer(notes);
 Step3.Executer(notes, inscrits);
 Step4.Executer(notes);
+Step5.Executer(notes);
 
 static Note? Parser(string ligne)
 {

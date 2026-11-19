@@ -147,3 +147,18 @@ Avec Count() > 0, les 13 notes sont testées. Avec Any(), une seule note est tes
 ### 4.4
 Le résultat est le même dans les deux cas : Ada 15, Barbara 15, Ada 16, Linus 16, Grace 17, Grace 18. Avec Where avant OrderBy, seules les 6 notes gardées passent par le tri. Avec OrderBy avant Where, les 13 notes sont triées avant d'être filtrées. Il vaut donc mieux filtrer avant de trier.
 
+## 5. Réécrire la classe Promo
+
+### 5.1
+On obtient les étudiants Ada, Alan, Grace, Linus et Barbara, une moyenne générale de 13,62 et Grace comme major. Le nombre de notes au moins égales à 10 est de 3 en Algo, 4 en BD et 5 en Reseau.
+
+Pour un étudiant sans aucune note, les deux Sum renvoient 0. La division 0 / 0 entre nombres décimaux ne lève pas d'exception : elle donne NaN (« pas un nombre »), qui s'afficherait comme moyenne. On l'évite en vérifiant d'abord que l'étudiant a au moins une note, et en renvoyant 0 sinon.
+
+### 5.2
+Le relevé donne, dans l'ordre du classement : 1. Grace 16,67 Très bien ; 2. Ada 15,17 Bien ; 3. Barbara 13,67 Assez bien ; 4. Linus 12,25 Assez bien ; 5. Alan 10,33 Passable.
+
+### 5.3
+La version LINQ est nettement plus courte : une trentaine de lignes, contre une soixantaine pour la classe Promo de la séance 1, et la plupart des méthodes tiennent en une ou deux lignes. Elle est aussi plus lisible, car chaque méthode décrit ce qu'on veut obtenir (filtrer, regrouper, trier) plutôt que la façon de le calculer avec des boucles et des variables intermédiaires. Elle est plus facile à modifier : changer un critère revient à changer une lambda. En revanche, il faut faire attention à l'évaluation différée, et le débogage pas à pas est moins direct qu'avec une boucle.
+
+### 5.4
+Oui, Classement() renvoie une requête différée, qui est recalculée à chaque parcours, et chaque calcul refait la moyenne de chaque étudiant en reparcourant toutes les notes. Ce n'est pas un problème ici : il n'y a que 13 notes et 5 étudiants, et comme la liste des notes est privée et ne change jamais, le résultat est toujours le même. Il faudrait mettre le classement en cache, par exemple avec ToList() dans un champ calculé une seule fois, si la promo contenait beaucoup d'étudiants et de notes, ou si le classement était demandé très souvent, comme à chaque affichage d'une page. Il faudrait alors penser à recalculer ce cache si les notes pouvaient changer.
