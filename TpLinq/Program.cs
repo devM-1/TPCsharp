@@ -30,7 +30,8 @@ foreach (var c in lignesInvalides)
 
 Console.WriteLine($"{notes.Count} notes valides et {inscrits.Count} inscrits.");  
 
-Exercice1.Executer(notes);
+Step1.Executer(notes);
+Step2.Executer(notes);
 
 
 static Note? Parser(string ligne)

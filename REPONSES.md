@@ -72,3 +72,42 @@ On place le calcul dans Etudiant, puisque c'est cette classe qui possède les no
 
 ### 0.2
 Avec Where(n => n is not null), le résultat reste de type IEnumerable<Note?> : Where retire des éléments mais ne change pas leur type, donc le compilateur considère toujours que chaque note peut être null. Avec OfType<Note>(), on obtient un IEnumerable<Note>. Les null sont écartés et le type n'est plus nullable, ce qui permet d'utiliser les notes sans avertissement ni vérification supplémentaire.
+
+## 1. Délégués et lambdas
+
+### 1.1
+Avec les trois critères, on obtient 4 notes d'Algo, 1 note inférieure à 10 (Alan en Algo) et 2 notes d'Ada supérieures ou égales à 15.
+
+La lambda stockée dans une variable est de type Func<Note, bool> : elle reçoit une Note et renvoie un booléen. On ne peut pas écrire var c = n => n.Valeur >= 15; : le compilateur affiche l'erreur CS8917, car il ne connaît pas le type de n et ne peut donc pas déduire le type de la lambda. Il faut préciser soit le type de la variable (Func<Note, bool>), soit celui du paramètre ((Note n) => n.Valeur >= 15).
+
+### 1.3
+On obtient 10 puis 6. La lambda capture la variable seuil elle-même, et non sa valeur au moment de sa création : elle relit seuil à chaque appel, donc le passage à 15 est pris en compte.
+
+En Java, ce code ne compile pas : une lambda ne peut utiliser qu'une variable locale finale ou effectivement finale, et seuil est modifiée après la création de la lambda.
+
+Pour garder le seuil 12, on copie sa valeur dans une variable qui ne change plus (double seuilFige = seuil;), et la lambda utilise cette copie. On peut aussi passer par une méthode comme AuDessusDe : son paramètre est une copie de la valeur, donc la lambda renvoyée ne dépend plus de la variable d'origine.
+
+## 2. Premières requêtes
+
+### 2.1
+Les notes d'Algo par valeur décroissante sont Grace 18, Ada 15, Linus 11 et Alan 9. Les matières, sans doublon et triées, sont Algo, BD et Reseau. La seule note sous 10 est celle d'Alan en Algo (9) : le type anonyme s'affiche { Prenom = Alan, Valeur = 9 } et le tuple (Alan, 9).
+
+Avec deux OrderBy successifs, le second refait entièrement le tri : les notes sont triées par valeur uniquement et les matières sont mélangées. Le premier tri ne sert plus qu'à départager les égalités. Avec ThenByDescending puis ThenBy, la valeur et le prénom deviennent des critères secondaires, et le tri par matière est conservé.
+
+Le top 3 est 18 (Grace, Algo), 17 (Grace, BD) et 16 (Ada, BD). Les places 4 à 6 sont 16 (Linus, Reseau), 15 (Ada, Algo) et 15 (Barbara, Reseau). Le tri est stable : à valeur égale, c'est l'ordre du fichier qui départage.
+
+### 2.2
+On obtient 13 notes, dont 1 inférieure à 10, et une moyenne simple de 13,77.
+
+Max renvoie seulement la meilleure valeur (18), alors que MaxBy renvoie la note entière qui l'atteint (Grace, Algo, 18, coefficient 3).
+
+La moyenne pondérée de toutes les notes vaut 13,72.
+
+Aggregate et string.Join donnent tous les deux « Ada, Alan, Grace, Linus, Barbara ». On préfère string.Join : il est plus lisible, il construit la chaîne en une seule fois au lieu de créer une chaîne intermédiaire à chaque étape, et il fonctionne aussi sur une liste vide, alors qu'Aggregate sans valeur initiale lève une exception.
+
+### 2.3
+FirstOrDefault renvoie null, car Linus n'a pas de note en BD. Avec First, on obtient une InvalidOperationException, car aucune note ne correspond.
+
+Single sur Ada en Algo renvoie sa note de 15. Single sur toutes les notes d'Ada lève une InvalidOperationException : Single exige exactement un élément, et Ada a trois notes.
+
+Il existe bien une note inférieure à 10 (Any renvoie True). Toutes les notes de BD valent au moins 12 (All renvoie True) ; Linus n'a pas de note en BD, il n'est donc pas pris en compte. All renvoie True sur une séquence vide, puisqu'aucun élément ne contredit la condition.

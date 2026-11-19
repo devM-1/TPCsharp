@@ -1,8 +1,8 @@
-public static class Exercice1
+public static class Step1
 {
     public static void Executer(List<Note> notes)
     {
-        Console.WriteLine("=== Exercice 1 ===");
+        Console.WriteLine("=== Delegue & Lambda ===");
 
         Console.WriteLine($"Notes d'Algo : {Filtrer(notes, EstEnAlgo).Count}");
         Console.WriteLine($"Notes sous 10 : {Filtrer(notes, n => n.Valeur < 10).Count}");
