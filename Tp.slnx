@@ -2,4 +2,5 @@
   <Project Path="TpCsharp.Tests/TpCsharp.Tests.csproj" />
   <Project Path="TpCsharp/TpCsharp.csproj" />
   <Project Path="TpLinq/TpLinq.csproj" />
+  <Project Path="TpSeance3/TpSeance3.csproj" />
 </Solution>
