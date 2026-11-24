@@ -1,27 +1,58 @@
-﻿using System.Globalization;
+﻿// 1.1 Une note invalide est refusée dès sa création
+try
+{
+    _ = new Note("Lovelace", "Ada", "Algo", 25, 3);
+}
+catch (ArgumentOutOfRangeException e)
+{
+    Console.WriteLine($"Note refusée : {e.ParamName} = {e.ActualValue}");
+}
 
-// Lecture des notes comme à la séance 2 (on la rendra plus stricte à l'étape 1)
-List<Note> notes = File.ReadLines("notes.csv")
-    .Skip(1)
-    .Select(Parser)
-    .OfType<Note>()
-    .ToList();
+try
+{
+    _ = new Note("Lovelace", "Ada", "Algo", 15, 0);
+}
+catch (ArgumentOutOfRangeException e)
+{
+    Console.WriteLine($"Note refusée : {e.ParamName} = {e.ActualValue}");
+}
 
-// Lecture des inscrits : on découpe chaque ligne et on ajoute le quatrième champ, le code postal
-List<Inscrit> inscrits = File.ReadLines("etudiants.csv")
-    .Skip(1)
-    .Select(ligne => ligne.Split(','))
-    .Select(c => new Inscrit(c[0], c[1], c[2], c[3]))
-    .ToList();
-
+// 1.2 Lecture stricte : chaque ligne rejetée est signalée avec son numéro et sa raison
+List<Note> notes = Lecture.LireNotes("notes.csv");
+List<Inscrit> inscrits = Lecture.LireInscrits("etudiants.csv");
 Console.WriteLine($"{notes.Count} notes valides et {inscrits.Count} inscrits.");
 
-static Note? Parser(string ligne)
+// Expérience throw; ou throw e; : à supprimer une fois les deux piles d'appels comparées
+Console.WriteLine("--- Avec throw; ---");
+try
 {
-    var c = ligne.Split(',');
-    if (c.Length != 5) return null;
-    if (!double.TryParse(c[3], CultureInfo.InvariantCulture, out var v)) return null;
-    if (v < 0 || v > 20) return null;
-    if (!int.TryParse(c[4], out var coef)) return null;
-    return new Note(c[0], c[1], c[2], v, coef);
+    Relancer(garderLaPile: true);
+}
+catch (ArgumentOutOfRangeException e)
+{
+    Console.WriteLine(e.StackTrace);
+}
+
+Console.WriteLine("--- Avec throw e; ---");
+try
+{
+    Relancer(garderLaPile: false);
+}
+catch (ArgumentOutOfRangeException e)
+{
+    Console.WriteLine(e.StackTrace);
+}
+
+static void Relancer(bool garderLaPile)
+{
+    try
+    {
+        _ = new Note("Lovelace", "Ada", "Algo", 25, 3);
+    }
+    catch (ArgumentOutOfRangeException)
+    {
+        if (garderLaPile)
+            throw;
+        throw;
+    }
 }

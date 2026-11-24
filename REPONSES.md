@@ -162,3 +162,13 @@ La version LINQ est nettement plus courte : une trentaine de lignes, contre une 
 
 ### 5.4
 Oui, Classement() renvoie une requête différée, qui est recalculée à chaque parcours, et chaque calcul refait la moyenne de chaque étudiant en reparcourant toutes les notes. Ce n'est pas un problème ici : il n'y a que 13 notes et 5 étudiants, et comme la liste des notes est privée et ne change jamais, le résultat est toujours le même. Il faudrait mettre le classement en cache, par exemple avec ToList() dans un champ calculé une seule fois, si la promo contenait beaucoup d'étudiants et de notes, ou si le classement était demandé très souvent, comme à chaque affichage d'une page. Il faudrait alors penser à recalculer ce cache si les notes pouvaient changer.
+
+# TP — C# séance 3 : réponses
+
+## 1. Exceptions
+
+**Pourquoi intercepter FormatException et ArgumentOutOfRangeException plutôt qu'Exception.** On n'intercepte que les erreurs qu'on attend et qu'on sait traiter : une ligne mal formée ou une note hors limites. Dans ces deux cas, on sait quoi faire : signaler la ligne et passer à la suivante. Intercepter Exception attraperait aussi les erreurs imprévues, comme un bug (NullReferenceException) ou un problème d'accès au fichier, qui seraient alors présentées à tort comme une simple ligne invalide et passeraient inaperçues. Intercepter des types précis permet aussi d'afficher un message adapté à chaque cas.
+
+**TryParse ou Parse dans un try.** On préfère TryParse quand l'échec est un cas normal et prévisible, comme une donnée saisie par un utilisateur ou lue dans un fichier. Parse dans un try convient quand l'échec est vraiment exceptionnel. Dans ParserStrict, une note non numérique dans le CSV est un cas attendu : on utilise donc TryParse, qui évite le coût d'une exception et permet de lever ensuite notre propre FormatException avec un message précis (numéro de ligne et raison), au lieu du message générique de double.Parse.
+
+**throw; et throw e;.** throw; relance l'exception en conservant sa pile d'appels d'origine : on voit toujours qu'elle a été levée dans le constructeur de Note. throw e; relance la même exception, mais remet sa pile d'appels à zéro à l'endroit du catch : la ligne d'origine disparaît, ce qui rend le débogage plus difficile. Il faut donc utiliser throw;, et l'analyseur du compilateur signale d'ailleurs throw e; par l'avertissement CA2200.
