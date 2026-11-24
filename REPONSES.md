@@ -70,7 +70,9 @@ On place le calcul dans Etudiant, puisque c'est cette classe qui possède les no
 
 ## 0. Mise en place
 
-### 0.2
+### 0.3
+On obtient 13 notes valides et 6 inscrits. La ligne de Barbara en Algo (abc) est écartée.
+
 Avec Where(n => n is not null), le résultat reste de type IEnumerable<Note?> : Where retire des éléments mais ne change pas leur type, donc le compilateur considère toujours que chaque note peut être null. Avec OfType<Note>(), on obtient un IEnumerable<Note>. Les null sont écartés et le type n'est plus nullable, ce qui permet d'utiliser les notes sans avertissement ni vérification supplémentaire.
 
 ## 1. Délégués et lambdas
@@ -192,3 +194,17 @@ Oui, Classement() renvoie une requête différée, qui est recalculée à chaque
 **Task.WhenAll.** Les trois appels attendus l'un après l'autre prennent environ 3 secondes, car chacun attend la fin du précédent. Lancés d'abord puis attendus ensemble avec Task.WhenAll, ils prennent environ 1 seconde, car les trois attentes se déroulent en même temps.
 
 **.Result.** Avec .Result, le programme fonctionne et prend environ 3 secondes. C'est tout de même déconseillé : .Result bloque le thread pendant toute l'attente au lieu de le libérer comme await, ce qui gaspille des ressources et fige une application graphique. Dans certains contextes, comme une application graphique ou l'ancien ASP.NET, il peut même provoquer un interblocage où le programme reste figé pour toujours. Enfin, en cas d'erreur, l'exception arrive enveloppée dans une AggregateException au lieu de l'exception d'origine.
+
+## 4. Interroger l'API geo.api.gouv.fr
+
+**Type de Population.** On choisit int : une population est un nombre entier d'habitants, et un int monte à plus de 2 milliards, ce qui suffit largement pour une commune (Paris compte environ 2 millions d'habitants). Un double n'aurait pas de sens, puisqu'il n'y a pas de fraction d'habitant.
+
+**Code postal 99999.** Pour un code postal qui n'existe pas, l'API renvoie une liste vide. CommunesAsync renvoie alors une liste vide, jamais null, grâce à l'opérateur ?? ; si le serveur refusait le code postal avec une erreur 400 ou 404, la méthode renverrait aussi une liste vide.
+
+**Adresse invalide.** Avec l'adresse https://geo.api.gouv.invalid/, on obtient une HttpRequestException, car le nom du serveur est introuvable. On l'intercepte pour afficher un message clair au lieu de laisser le programme s'arrêter.
+
+**Délai maximal.** Quand le délai du CancellationTokenSource est dépassé, les requêtes en cours sont annulées et une TaskCanceledException est levée ; c'est une sorte d'OperationCanceledException, que l'on intercepte.
+
+**Pourquoi un seul HttpClient.** Chaque HttpClient gère ses propres connexions réseau. En créer un nouveau pour chaque requête oblige à ouvrir à chaque fois une nouvelle connexion sécurisée, ce qui est lent. Les connexions fermées restent en plus réservées quelques instants par le système : avec beaucoup de requêtes, on peut épuiser les ports réseau disponibles. Un seul HttpClient partagé réutilise ses connexions d'une requête à l'autre et peut envoyer plusieurs requêtes en même temps sans problème.
+
+**Pourquoi une erreur ne doit pas tout faire échouer.** Les requêtes sont indépendantes : un code postal inconnu ne concerne que Margaret, et les communes des autres étudiants sont valides et doivent s'afficher. Or, avec Task.WhenAll, si une seule tâche lève une exception, l'attente la relance et on perd tous les résultats. On l'a garanti de deux façons : CommunesAsync renvoie une liste vide au lieu d'une exception quand aucune commune ne correspond, et DecrireInscritAsync intercepte les erreurs réseau de sa propre requête. Chaque tâche se termine donc toujours avec une ligne de texte, au pire « commune inconnue ».

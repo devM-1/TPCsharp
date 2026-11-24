@@ -1,5 +1,6 @@
 using System.Diagnostics;
 
+// Étape 3.2 : mesurer le gain de Task.WhenAll sur des opérations lentes
 public static class DemoAsync
 {
     public static async Task ExecuterAsync()
@@ -18,13 +19,6 @@ public static class DemoAsync
         Task<string> tacheC = OperationLenteAsync("C");
         string[] resultats = await Task.WhenAll(tacheA, tacheB, tacheC);
         Console.WriteLine($"Avec Task.WhenAll : {string.Join(", ", resultats)} en {chrono.Elapsed.TotalSeconds:F2} s");
-
-        // 16. Expérience avec .Result : à supprimer une fois le résultat noté (interdit dans le rendu)
-        chrono.Restart();
-        string ra = OperationLenteAsync("A").Result;
-        string rb = OperationLenteAsync("B").Result;
-        string rc = OperationLenteAsync("C").Result;
-        Console.WriteLine($"Avec .Result : {ra}, {rb}, {rc} en {chrono.Elapsed.TotalSeconds:F2} s");
     }
 
     // Simule une opération lente : Task.Delay attend 1 seconde sans bloquer le thread

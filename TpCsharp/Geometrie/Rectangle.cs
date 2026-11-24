@@ -2,10 +2,12 @@ namespace Geometrie;
 
 public class Rectangle : Forme
 {
+    // Un rectangle créé directement porte le nom « Rectangle »
     public Rectangle(double largeur, double hauteur) : this("Rectangle", largeur, hauteur)
     {
     }
 
+    // Réservé aux classes filles, pour qu'un carré garde son propre nom
     protected Rectangle(string nom, double largeur, double hauteur) : base(nom)
     {
         if (largeur <= 0)

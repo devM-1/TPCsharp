@@ -1,5 +1,6 @@
 using System.Text.Json;
 
+// Sauvegarde et chargement de la promo au format JSON
 public static class Stockage
 {
     // Options partagées par toutes les sauvegardes : conventions du Web (camelCase) et JSON indenté
@@ -10,6 +11,7 @@ public static class Stockage
     public static void Sauver(string chemin, List<Note> notes) =>
         File.WriteAllText(chemin, JsonSerializer.Serialize(notes, Options));
 
+    // Si le fichier contient seulement « null », on le traite comme un fichier abîmé
     public static List<Note> Charger(string chemin) =>
         JsonSerializer.Deserialize<List<Note>>(File.ReadAllText(chemin), Options)
         ?? throw new JsonException($"{Path.GetFileName(chemin)} ne contient pas de liste de notes.");

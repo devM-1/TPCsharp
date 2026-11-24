@@ -2,6 +2,7 @@ namespace Geometrie;
 
 public class Cercle : Forme
 {
+    // base("Cercle") appelle le constructeur de Forme, comme super en Java
     public Cercle(double rayon) : base("Cercle")
     {
         if (rayon <= 0)
@@ -14,5 +15,6 @@ public class Cercle : Forme
     public override double Aire() => Math.PI * Rayon * Rayon;
     public override double Perimetre() => 2 * Math.PI * Rayon;
 
+    // Reprend la description de Forme et ajoute le rayon
     public override string Decrire() => $"{base.Decrire()}, rayon {Rayon:F2}";
 }

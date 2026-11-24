@@ -1,5 +1,6 @@
 using System.Globalization;
 
+// Lecture des fichiers CSV de notes et d'inscrits
 public static class Lecture
 {
     // Transforme une ligne en Note, ou lève une FormatException qui explique pourquoi c'est impossible
@@ -40,6 +41,7 @@ public static class Lecture
         return notes;
     }
 
+    // Lit les inscrits ; ici, on suppose que toutes les lignes sont valides
     public static List<Inscrit> LireInscrits(string chemin) => File.ReadLines(chemin)
         .Skip(1)
         .Select(ligne => ligne.Split(','))

@@ -2,7 +2,7 @@ public static class Step5
 {
     public static void Executer(List<Note> notes)
     {
-        Console.WriteLine("=== Step 5 ===");
+        Console.WriteLine("=== Exercice 5 : classe Promo en LINQ ===");
         var promo = new Promo("M1 Info", notes);
 
         Console.WriteLine($"Étudiants : {string.Join(", ", promo.Etudiants())}");

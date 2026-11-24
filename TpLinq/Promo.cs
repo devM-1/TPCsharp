@@ -1,3 +1,4 @@
+// La promo réécrite en LINQ : chaque méthode est une requête sur la liste des notes
 public class Promo(string nom, IEnumerable<Note> notes)
 {
     private readonly List<Note> _notes = notes.ToList();

@@ -2,7 +2,7 @@ public static class Step2
 {
     public static void Executer(List<Note> notes)
     {
-        Console.WriteLine("=== Premiere requetes===");
+        Console.WriteLine("=== Exercice 2 : premières requêtes ===");
 
         // 2.1.1 On garde les notes d'Algo, puis on les trie de la plus haute à la plus basse
         var algo = notes

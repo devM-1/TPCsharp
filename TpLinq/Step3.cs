@@ -2,7 +2,7 @@ public static class Step3
 {
     public static void Executer(List<Note> notes, List<Inscrit> inscrits)
     {
-        Console.WriteLine("=== Step 3 ===");
+        Console.WriteLine("=== Exercice 3 : regrouper et joindre ===");
 
         // 3.1.1 On range les notes dans des groupes, un groupe par matière
         // Chaque groupe est un IGrouping<string, Note> : une clé (la matière) et les notes qui vont avec

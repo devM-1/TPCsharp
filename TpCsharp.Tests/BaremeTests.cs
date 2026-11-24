@@ -4,6 +4,7 @@ namespace TpCsharp.Tests;
 
 public class BaremeTests
 {
+    // Chaque ligne InlineData est un cas de test : une moyenne et la mention attendue
     [Theory]
     [InlineData(18.0, "Très bien")]
     [InlineData(16.0, "Très bien")]
@@ -16,6 +17,7 @@ public class BaremeTests
         Assert.Equal(attendu, Bareme.Mention(moyenne));
     }
 
+    // Une moyenne hors de 0 à 20 doit lever une exception
     [Theory]
     [InlineData(-0.5)]
     [InlineData(21.0)]

@@ -1,5 +1,6 @@
 namespace Ecole;
 
+// Une promo : un nom et la liste de ses étudiants
 public class Promo
 {
     private readonly List<Etudiant> _etudiants = [];
@@ -16,6 +17,7 @@ public class Promo
         _etudiants.Add(e);
     }
 
+    // Cherche un étudiant par son nom, sans tenir compte des majuscules ; null s'il n'existe pas
     public Etudiant? Chercher(string nom)
     {
         foreach (var e in _etudiants)
@@ -26,6 +28,7 @@ public class Promo
         return null;
     }
 
+    // L'étudiant qui a la meilleure moyenne ; null si la promo est vide
     public Etudiant? Major()
     {
         Etudiant? meilleur = null;
@@ -37,6 +40,7 @@ public class Promo
         return meilleur;
     }
 
+    // Moyenne des moyennes des étudiants, 0 si la promo est vide
     public double MoyenneGenerale()
     {
         if (_etudiants.Count == 0)
@@ -47,6 +51,7 @@ public class Promo
         return somme / _etudiants.Count;
     }
 
+    // Une ligne par étudiant, avec sa mention et sa moyenne pondérée
     public void AfficherReleve()
     {
         Console.WriteLine($"Relevé de la promo {Nom}");
