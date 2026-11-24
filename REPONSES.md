@@ -172,3 +172,23 @@ Oui, Classement() renvoie une requête différée, qui est recalculée à chaque
 **TryParse ou Parse dans un try.** On préfère TryParse quand l'échec est un cas normal et prévisible, comme une donnée saisie par un utilisateur ou lue dans un fichier. Parse dans un try convient quand l'échec est vraiment exceptionnel. Dans ParserStrict, une note non numérique dans le CSV est un cas attendu : on utilise donc TryParse, qui évite le coût d'une exception et permet de lever ensuite notre propre FormatException avec un message précis (numéro de ligne et raison), au lieu du message générique de double.Parse.
 
 **throw; et throw e;.** throw; relance l'exception en conservant sa pile d'appels d'origine : on voit toujours qu'elle a été levée dans le constructeur de Note. throw e; relance la même exception, mais remet sa pile d'appels à zéro à l'endroit du catch : la ligne d'origine disparaît, ce qui rend le débogage plus difficile. Il faut donc utiliser throw;, et l'analyseur du compilateur signale d'ailleurs throw e; par l'avertissement CA2200.
+
+## 2. Sauvegarder la promo en JSON
+
+**Noms des propriétés.** Dans promo.json, les noms des propriétés s'écrivent en camelCase (nom, prenom, matiere, valeur, coef), alors qu'ils commencent par une majuscule en C#. C'est l'effet de JsonSerializerDefaults.Web, qui applique les conventions du Web : en JavaScript et dans la plupart des API, les noms de propriétés JSON commencent par une minuscule.
+
+**promo.json abîmé.** Quand on supprime une accolade, le fichier n'est plus un JSON valide : Deserialize lève une JsonException, dont le message indique la ligne et la position de l'erreur. On l'intercepte, on affiche un message clair, puis le programme repart de notes.csv et réécrit un promo.json correct.
+
+**Note à 30.** Le JSON reste valide, mais le désérialiseur crée chaque note en appelant le constructeur du record Note, qui vérifie la valeur : il lève donc une ArgumentOutOfRangeException. C'est le comportement souhaité, car une note invalide ne peut jamais entrer dans le programme, quelle que soit sa provenance. Il faut seulement intercepter cette exception, comme pour un fichier abîmé, pour que le programme ne s'arrête pas.
+
+**Quand Deserialize renvoie null.** Deserialize renvoie null quand le fichier contient simplement le mot null : c'est un JSON valide, mais il ne représente aucune liste. Dans Charger, on traite ce cas comme un fichier invalide : l'opérateur ?? lève une JsonException, et le programme repart de notes.csv comme pour un fichier abîmé. On évite ainsi de travailler ensuite avec une liste null.
+
+**Path.Combine.** Le séparateur de dossiers n'est pas le même selon le système : \ sous Windows, / sous Linux et macOS. Un chemin écrit à la main pour Windows ne fonctionnerait donc pas dans un conteneur Docker, qui tourne sous Linux. Path.Combine assemble les morceaux avec le bon séparateur pour le système où tourne le programme, et gère les séparateurs en trop ou manquants.
+
+## 3. Passer en asynchrone
+
+**Await oublié.** En supprimant le await devant Stockage.SauverAsync, le compilateur affiche l'avertissement CS4014 : l'appel n'est pas attendu, donc la méthode continue avant que la sauvegarde soit terminée. À l'exécution, le programme afficherait que la promo est enregistrée alors que l'écriture est peut-être encore en cours, et il pourrait même se terminer avant la fin de l'écriture, en laissant un promo.json incomplet. Une erreur pendant la sauvegarde serait aussi perdue, puisque personne n'attend la tâche.
+
+**Task.WhenAll.** Les trois appels attendus l'un après l'autre prennent environ 3 secondes, car chacun attend la fin du précédent. Lancés d'abord puis attendus ensemble avec Task.WhenAll, ils prennent environ 1 seconde, car les trois attentes se déroulent en même temps.
+
+**.Result.** Avec .Result, le programme fonctionne et prend environ 3 secondes. C'est tout de même déconseillé : .Result bloque le thread pendant toute l'attente au lieu de le libérer comme await, ce qui gaspille des ressources et fige une application graphique. Dans certains contextes, comme une application graphique ou l'ancien ASP.NET, il peut même provoquer un interblocage où le programme reste figé pour toujours. Enfin, en cas d'erreur, l'exception arrive enveloppée dans une AggregateException au lieu de l'exception d'origine.
