@@ -1,0 +1,93 @@
+[
+  {
+    "nom": "Lovelace",
+    "prenom": "Ada",
+    "matiere": "Algo",
+    "valeur": 30,
+    "coef": 3
+  },
+  {
+    "nom": "Lovelace",
+    "prenom": "Ada",
+    "matiere": "BD",
+    "valeur": 16,
+    "coef": 2
+  },
+  {
+    "nom": "Lovelace",
+    "prenom": "Ada",
+    "matiere": "Reseau",
+    "valeur": 14,
+    "coef": 1
+  },
+  {
+    "nom": "Turing",
+    "prenom": "Alan",
+    "matiere": "Algo",
+    "valeur": 9,
+    "coef": 3
+  },
+  {
+    "nom": "Turing",
+    "prenom": "Alan",
+    "matiere": "BD",
+    "valeur": 12,
+    "coef": 2
+  },
+  {
+    "nom": "Turing",
+    "prenom": "Alan",
+    "matiere": "Reseau",
+    "valeur": 11,
+    "coef": 1
+  },
+  {
+    "nom": "Hopper",
+    "prenom": "Grace",
+    "matiere": "Algo",
+    "valeur": 18,
+    "coef": 3
+  },
+  {
+    "nom": "Hopper",
+    "prenom": "Grace",
+    "matiere": "BD",
+    "valeur": 17,
+    "coef": 2
+  },
+  {
+    "nom": "Hopper",
+    "prenom": "Grace",
+    "matiere": "Reseau",
+    "valeur": 12,
+    "coef": 1
+  },
+  {
+    "nom": "Torvalds",
+    "prenom": "Linus",
+    "matiere": "Algo",
+    "valeur": 11,
+    "coef": 3
+  },
+  {
+    "nom": "Torvalds",
+    "prenom": "Linus",
+    "matiere": "Reseau",
+    "valeur": 16,
+    "coef": 1
+  },
+  {
+    "nom": "Liskov",
+    "prenom": "Barbara",
+    "matiere": "BD",
+    "valeur": 13,
+    "coef": 2
+  },
+  {
+    "nom": "Liskov",
+    "prenom": "Barbara",
+    "matiere": "Reseau",
+    "valeur": 15,
+    "coef": 1
+  }
+]

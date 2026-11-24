@@ -3,7 +3,7 @@ public record Note(string Nom, string Prenom, string Matiere, double Valeur, int
     // La valeur est vérifiée dès la création : en dehors de 0 à 20, on lève une exception
     public double Valeur { get;} = Valeur is >=0 and <=20 
         ? Valeur
-        : throw new ArgumentOutOfRangeException(nameof(Valeur),"La valeur de la note doit être comprise entre 0 et 20.");
+        : throw new ArgumentOutOfRangeException(nameof(Valeur),Valeur, "La valeur de la note doit être comprise entre 0 et 20.");
 
      public int Coef { get; init; } = VerifierCoef(Coef);
 
