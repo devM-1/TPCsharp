@@ -68,3 +68,41 @@ using (var db = new PromoContext())
     Console.WriteLine($"SQL : {moyennes.ToQueryString()}");
 
 }
+
+
+using (var db = new PromoContext())
+{
+    // 14. Alan passe en M2 : on change la propriété, et le contexte repère tout seul la modification
+    var alan = db.Etudiants.FirstOrDefault(e => e.Nom == "Turing");
+    if (alan is not null)
+    {
+        alan.Promo = "M2";
+        Console.WriteLine($"État d'Alan avant SaveChanges : {db.Entry(alan).State}");
+        db.SaveChanges();
+    }
+
+    // 15. Suppression de Linus : la base supprime aussi ses notes (cascade)
+    var linus = db.Etudiants.FirstOrDefault(e => e.Nom == "Torvalds");
+    if (linus is not null)
+    {
+        db.Etudiants.Remove(linus);
+        db.SaveChanges();
+    }
+    Console.WriteLine($"Notes restantes : {db.Notes.Count()}");
+
+    // 16. On charge d'abord la note de Réseau d'Ada, pour voir ce que devient un objet déjà en mémoire
+    var reseauAda = db.Notes.FirstOrDefault(n => n.Matiere == "Reseau" && n.Etudiant.Prenom == "Ada");
+
+    // ExecuteUpdate envoie directement un UPDATE à la base : rien n'est chargé, et pas besoin de SaveChanges
+    int nb = db.Notes.Where(n => n.Matiere == "Reseau")
+                     .ExecuteUpdate(s => s.SetProperty(n => n.Coef, 2));
+    Console.WriteLine($"{nb} notes de Réseau modifiées");
+
+    if (reseauAda is not null)
+    {
+        // L'objet déjà chargé n'a pas été prévenu : il garde l'ancien coefficient jusqu'à ce qu'on le relise
+        Console.WriteLine($"Coef de la note d'Ada en mémoire : {reseauAda.Coef}");
+        db.Entry(reseauAda).Reload();
+        Console.WriteLine($"Après Reload : {reseauAda.Coef}");
+    }
+}
