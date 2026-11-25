@@ -208,3 +208,13 @@ Oui, Classement() renvoie une requête différée, qui est recalculée à chaque
 **Pourquoi un seul HttpClient.** Chaque HttpClient gère ses propres connexions réseau. En créer un nouveau pour chaque requête oblige à ouvrir à chaque fois une nouvelle connexion sécurisée, ce qui est lent. Les connexions fermées restent en plus réservées quelques instants par le système : avec beaucoup de requêtes, on peut épuiser les ports réseau disponibles. Un seul HttpClient partagé réutilise ses connexions d'une requête à l'autre et peut envoyer plusieurs requêtes en même temps sans problème.
 
 **Pourquoi une erreur ne doit pas tout faire échouer.** Les requêtes sont indépendantes : un code postal inconnu ne concerne que Margaret, et les communes des autres étudiants sont valides et doivent s'afficher. Or, avec Task.WhenAll, si une seule tâche lève une exception, l'attente la relance et on perd tous les résultats. On l'a garanti de deux façons : CommunesAsync renvoie une liste vide au lieu d'une exception quand aucune commune ne correspond, et DecrireInscritAsync intercepte les erreurs réseau de sa propre requête. Chaque tâche se termine donc toujours avec une ligne de texte, au pire « commune inconnue ».
+
+# TP — C# séance 4 : Entity Framework Core — réponses
+
+## 1. Le modèle et la base
+
+**Contenu de la migration.** La migration crée deux tables, Etudiants et Notes. La colonne Notes.EtudiantId est une clé étrangère vers Etudiants (FK_Notes_Etudiants_EtudiantId), avec une suppression en cascade : supprimer un étudiant supprime aussi toutes ses notes. EF Core crée aussi un index IX_Notes_EtudiantId, qui accélère la recherche des notes d'un étudiant.
+
+**Colonnes NOT NULL.** Le mode Nullable est activé dans le projet : une propriété de type string, sans point d'interrogation, ne doit jamais valoir null. EF Core suit cette information et crée une colonne NOT NULL. Pour obtenir une colonne qui accepte NULL, il faudrait écrire string?. Valeur et Coef sont aussi NOT NULL, car double et int ne peuvent pas valoir null.
+
+**Clé étrangère devinée.** EF Core s'appuie sur ses conventions de nommage : la propriété EtudiantId porte le nom de la navigation Etudiant suivi de Id, qui est le nom de la clé primaire de l'entité Etudiant, et elle a le même type, int. Avec la navigation Etudiant d'un côté et la liste Notes de l'autre, EF Core en déduit une relation un-à-plusieurs. Comme EtudiantId est un int non nullable, la relation est obligatoire : une note a toujours un étudiant, d'où la suppression en cascade.

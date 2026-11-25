@@ -482,3 +482,7 @@ $RECYCLE.BIN/
 *.swp
 
 promo.json
+
+*.db
+*.db-shm
+*.db-wal
