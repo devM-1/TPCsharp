@@ -83,3 +83,9 @@ Ensuite, utilise dans ce terminal les mêmes commandes que ci-dessus (`dotnet bu
 ## Fichiers générés
 
 Les dossiers `bin/` et `obj/`, ainsi que le fichier `promo.json`, sont produits par la compilation ou par le programme. Ils sont exclus du dépôt par le `.gitignore`.
+
+## 2. Insérer la promo
+
+**Premier lancement.** Avant SaveChanges, Ada est dans l'état Added : AddRange l'a seulement marquée comme à ajouter, et rien n'est encore écrit. SaveChanges écrit 19 lignes (6 étudiants et 13 notes) dans une seule transaction et renvoie ce nombre. Ada passe ensuite à l'état Unchanged, car elle correspond maintenant à ce qui est en base, et son Id vaut 1 : la clé générée par la base a été recopiée dans l'objet. Les notes ont été ajoutées avec leur étudiant, et EF Core a rempli leur EtudiantId tout seul.
+
+**Second lancement.** Rien n'est inséré : les données sont désormais enregistrées dans le fichier promo.db, donc db.Etudiants.Any() renvoie true et le bloc d'insertion est sauté. Le journal ne montre que la requête SELECT EXISTS qui vérifie s'il y a déjà des étudiants.
